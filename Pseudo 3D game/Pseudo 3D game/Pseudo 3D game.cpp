@@ -2,10 +2,57 @@
 //
 
 #include <iostream>
+#include <Windows.h>
+
+using namespace std;
+
+int screenWidth = 120;//ширина консоли
+int screenHeight = 40;//высота консоли
+
+float playerX = 1.0f;//координата игрока по x
+float playerY = 1.0f;//координата игрока по y
+float playerA = 0.0f;//направление игрока
+
+int mapHeight = 16;//высота игрового поля
+int mapWidth = 16;//ширина игрового поля
+
+float FOV = 3.14159 / 3;//угол обзора (поле видимости)
+float depth = 30.0f;//максимальная дистанция обзора
 
 int main()
 {
-    std::cout << "Hello World!\n";
+    //7 строк ниже представляют собой конструкцию, выводящую данные в консоль. Cout не используем, так как он слишком медленный (без понятия как эта конструкция работает)
+    wchar_t* screen = new wchar_t[screenWidth * screenHeight + 1]; // Массив для записи в буфер
+    HANDLE hConsole = CreateConsoleScreenBuffer(GENERIC_READ | GENERIC_WRITE, 0, NULL, CONSOLE_TEXTMODE_BUFFER, NULL); // Буфер экрана
+    SetConsoleActiveScreenBuffer(hConsole); // Настройка консоли
+    DWORD dwBytesWritten = 0; // Для дебага
+
+    screen[screenWidth * screenHeight] = '\0';  // Последний символ - окончание строки
+    WriteConsoleOutputCharacter(hConsole, screen, screenWidth * screenHeight, { 0, 0 }, &dwBytesWritten); // Запись в буфер
+
+    wstring map;//wstring - "широкие", локализованные символы
+    map += L"################";
+    map += L"#..............#";
+    map += L"#..............#";
+    map += L"#..............#";
+    map += L"#..............#";
+    map += L"#..............#";
+    map += L"#..............#";
+    map += L"#..............#";
+    map += L"#..............#";
+    map += L"#..............#";
+    map += L"#..............#";
+    map += L"#..............#";
+    map += L"#..............#";
+    map += L"#..............#";
+    map += L"#..............#";
+    map += L"################";
+
+    while (1)
+    {
+
+    }
+    return 0;
 }
 
 // Запуск программы: CTRL+F5 или меню "Отладка" > "Запуск без отладки"
