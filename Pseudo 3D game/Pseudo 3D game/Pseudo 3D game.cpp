@@ -59,19 +59,23 @@ int main()
 
 		if (GetAsyncKeyState((unsigned short)'W') & 0x8000)//клавишей W идём вперёд
 		{
-			if (map[(int)playerY * mapWidth + (int)playerX] != '#')//если ячейка, куда хотим переместиться не является стеной
+			playerX += sinf(playerA) * 5.0f * fElapsedTime;//sinf точнее sin
+			playerY += cosf(playerA) * 5.0f * fElapsedTime;
+			if (map[(int)playerY * mapWidth + (int)playerX] == '#')//если ячейка, куда хотим переместиться не является стеной
 			{
-				playerX += sinf(playerA);//sinf точнее sin
-				playerY += cosf(playerA);
+				playerX -= sinf(playerA) * 5.0f * fElapsedTime;//sinf точнее sin
+				playerY -= cosf(playerA) * 5.0f * fElapsedTime;
 			}
 		}
 
 		if (GetAsyncKeyState((unsigned short)'S') & 0x8000)//клавишей S идём назад
 		{
-			if (map[(int)playerY * mapWidth + (int)playerX] != '#')
+			playerX -= sinf(playerA) * 5.0f * fElapsedTime;
+			playerY -= cosf(playerA) * 5.0f * fElapsedTime;
+			if (map[(int)playerY * mapWidth + (int)playerX] == '#')
 			{
-				playerX -= sinf(playerA);
-				playerY -= cosf(playerA);
+				playerX += sinf(playerA) * 5.0f * fElapsedTime;
+				playerY += cosf(playerA) * 5.0f * fElapsedTime;
 			}
 		}
 
@@ -83,6 +87,34 @@ int main()
 		if (GetAsyncKeyState((unsigned short)'D') & 0x8000)//клавишей D поворачиваем против часовой стрелке
 		{
 			playerA += 1.5f * fElapsedTime;
+		}
+
+		for (int x = 0; x < screenWidth; x++)//проходим по всем x
+		{
+			float rayAngle = (playerA - FOV / 2.0f) + ((float)x / (float)screenWidth) * FOV;//направление луча	
+			//находим расстоние до стены в направлении rayAngle
+
+			float distanceToWall = 0.0f;//расстоние до препятствия в направлении rayAngle
+			bool hitWall = false;//достигнул ли луч стенки
+
+			float eyeX = sinf(rayAngle);//координаты единичеого вектора rayAngle
+			float eyeY = cosf(rayAngle);
+
+			while (!hitWall && distanceToWall < depth)//пока не столкнулись со стеной или не вышли за радиус видимости
+			{
+				distanceToWall += 0.1f;
+
+				int testX = (int)(playerX + eyeX * distanceToWall);//точка на игровом поле
+				int testY = (int)(playerY + eyeY * distanceToWall);//в которую попал луч
+
+				if (testX<0 || testX>mapWidth || testY<0 || testY>mapHeight)//если вышли за зону
+				{
+					hitWall = true;
+					distanceToWall = depth;
+				}
+				else if (map[testY * mapWidth + testX] == '#')
+					hitWall = true;
+			}
 		}
 	}
 	return 0;
